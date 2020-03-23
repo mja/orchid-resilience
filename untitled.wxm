@@ -1,0 +1,79 @@
+/* 
+Orchid model of BSC
+Mark James Adams
+ */
+
+/* 
+PHENOTYPE AND FITNESS
+ */
+
+
+
+/*  Phenotype sensitivity with 3 genetic and
+    one early environmental factor */
+phi_r(g1, g2, g3, e1) := g1 + g3 * (e1-g2)^2;
+
+
+plot2d([phi_r(0, 0, 1, e1), phi_r(3, 0, 1, e1),
+          phi_r(0, 1, 1, e1), phi_r(1, 0, 0.5, e1)],
+[e1, -3, 3], [y, 0, 10],
+[legend, "g3 = 1", "g1 = 3", "g2 = 1", "g3 = 0.5"]);
+
+/* Fitness function */
+w(phi, e2) := -phi*e2;
+
+plot2d([w(0.5, e2), w(1, e2),
+          w(2, e2)],
+[e2, -3, 3], [y, -5, 5],
+[legend, "Robust", "  ", "Sensitive"]);
+
+/* Alternative phenotype to make g1 and g3 more biological */
+phi_a(g1, g2, g3, e1) := %e^g1 + %e^g3 * (e1 - g2)^2;
+
+plot2d([phi_a(0, 0, 1, e1), phi_a(3, 0, 1, e1),
+          phi_a(0, 1, 1, e1), phi_a(1, 0, 0.5, e1)],
+[e1, -3, 3], [y, 0, 10],
+[legend, "g3 = 1", "g1 = 3", "g2 = 1", "g3 = 0.5"]);
+
+
+
+/*
+
+TENSORS
+
+*/
+
+outer(A, B) := A . transpose(B);
+
+inner(A, B) := transpose(A) . B;
+
+
+/* first derivatives */ 
+D_1 : matrix([diff(phi_r(g1, g2, g3, e1), g1)],
+            [diff(phi_r(g1, g2, g3, e1), g2)],
+            [diff(phi_r(g1, g2, g3, e1), g3)],
+            [diff(phi_r(g1, g2, g3, e1), e1)],
+            [diff(phi_r(g1, g2, g3, e1), e2)]);
+            
+/* means */
+
+P_1 : matrix([P1],
+             [P2],
+             [P3],
+             [P4],
+             [P5]);
+             
+/* covariances */
+
+P_2 : matrix([P11, P12, P13, P14, P15],
+             [P12, P22, P23, P24, P25],
+             [P13, P23, P33, P34, P35],
+             [P14, P24, P34, P44, P45],
+             [P15, P25, P35, P45, P55]);
+             
+P_2 . D1;
+
+inner(P_2, D1);
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 20.02.4"$
